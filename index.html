@@ -1,49 +1,155 @@
 <!DOCTYPE html>
-<html>
-    <link rel="stylesheet" href="styles.css">
+<html lang="en">
 <head>
-  <title>Register</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login & Register</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 400px; margin: 40px auto; }
+  h2 { text-align: center; }
+  .form-container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+  .tab { display: inline-block; margin: 0 10px; cursor: pointer; font-weight: bold; }
+  .tab.active { color: blue; }
+  form { display: none; margin-top: 20px; }
+  form.active { display: block; }
+  label { display: block; margin-top: 10px; }
+  input[type=text], input[type=password] {
+    width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box;
+  }
+  button {
+    margin-top: 20px; padding: 10px; width: 100%; background: blue; color: white; border: none; cursor: pointer;
+  }
+  .message { margin-top: 15px; text-align: center; }
+</style>
 </head>
 <body>
-  <h2>Register</h2>
-  <form id="registerForm">
-    <input type="text" id="username" placeholder="Username" required><br>
-    <input type="password" id="password" placeholder="Password" required><br>
-    <input type="text" id="fullName" placeholder="Full Name" required><br>
-    <input type="text" id="studentNumber" placeholder="Student Number" required><br>
-    <input type="text" id="qrCode" placeholder="QR Code" required><br>
+
+<h2>Login & Register</h2>
+
+<div>
+  <span id="tab-login" class="tab active">Login</span>
+  <span id="tab-register" class="tab">Register</span>
+</div>
+
+<div class="form-container">
+  <form id="login-form" class="active">
+    <label>Username
+      <input type="text" id="login-username" required />
+    </label>
+    <label>Password
+      <input type="password" id="login-password" required />
+    </label>
+    <button type="submit">Login</button>
+  </form>
+
+  <form id="register-form">
+    <label>Username
+      <input type="text" id="reg-username" required />
+    </label>
+    <label>Password
+      <input type="password" id="reg-password" required />
+    </label>
+    <label>Full Name
+      <input type="text" id="reg-fullname" required />
+    </label>
+    <label>Student Number
+      <input type="text" id="reg-studentnumber" required />
+    </label>
+    <label>Course
+      <input type="text" id="reg-course" required />
+    </label>
     <button type="submit">Register</button>
   </form>
 
-  <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzEo4EFfmetqWJK3jTun7LqOBuxE5QK3V1tGwpF1dSsLgcXC-6ygLcgq9mndCronVRAxg/exec';  // Put your deployed web app URL here
+  <div class="message" id="message"></div>
+</div>
 
-    document.getElementById('registerForm').addEventListener('submit', e => {
-      e.preventDefault();
+<script>
+  const webAppUrl = "PASTE_YOUR_WEB_APP_URL_HERE"; // Replace with your Apps Script Web App URL
 
-      const data = {
-        username: document.getElementById('username').value,
-        password: document.getElementById('password').value,
-        fullName: document.getElementById('fullName').value,
-        studentNumber: document.getElementById('studentNumber').value,
-        qrCode: document.getElementById('qrCode').value
-      };
+  const loginTab = document.getElementById('tab-login');
+  const registerTab = document.getElementById('tab-register');
+  const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
+  const messageBox = document.getElementById('message');
 
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {'Content-Type': 'application/json'}
-      })
-      .then(response => response.json())
-      .then(response => {
-        if(response.status === 'success'){
-          alert('Registration successful!');
-        } else {
-          alert('Registration failed.');
-        }
-      })
-      .catch(err => alert('Error: ' + err.message));
+  loginTab.onclick = () => {
+    loginTab.classList.add('active');
+    registerTab.classList.remove('active');
+    loginForm.classList.add('active');
+    registerForm.classList.remove('active');
+    messageBox.textContent = "";
+  };
+
+  registerTab.onclick = () => {
+    registerTab.classList.add('active');
+    loginTab.classList.remove('active');
+    registerForm.classList.add('active');
+    loginForm.classList.remove('active');
+    messageBox.textContent = "";
+  };
+
+  loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    messageBox.textContent = "Logging in...";
+    const data = {
+      action: "login",
+      username: document.getElementById('login-username').value.trim(),
+      password: document.getElementById('login-password').value.trim(),
+    };
+    fetch(webAppUrl, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(resp => {
+      messageBox.textContent = resp.message;
+      if (resp.status === "success") {
+        // Do something on successful login
+        messageBox.style.color = "green";
+      } else {
+        messageBox.style.color = "red";
+      }
+    })
+    .catch(err => {
+      messageBox.textContent = "Error connecting to server";
+      messageBox.style.color = "red";
     });
-  </script>
+  });
+
+  registerForm.addEventListener('submit', e => {
+    e.preventDefault();
+    messageBox.textContent = "Registering...";
+    const data = {
+      action: "register",
+      username: document.getElementById('reg-username').value.trim(),
+      password: document.getElementById('reg-password').value.trim(),
+      fullname: document.getElementById('reg-fullname').value.trim(),
+      studentnumber: document.getElementById('reg-studentnumber').value.trim(),
+      course: document.getElementById('reg-course').value.trim()
+    };
+    fetch(webAppUrl, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(resp => {
+      messageBox.textContent = resp.message;
+      if (resp.status === "success") {
+        messageBox.style.color = "green";
+        registerForm.reset();
+      } else {
+        messageBox.style.color = "red";
+      }
+    })
+    .catch(err => {
+      messageBox.textContent = "Error connecting to server";
+      messageBox.style.color = "red";
+    });
+  });
+</script>
+
 </body>
 </html>
