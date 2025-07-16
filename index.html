@@ -5,7 +5,79 @@
   <title>Login & Register</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <style>
-    /* Your CSS styling here */
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    h2 {
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 30px;
+    }
+    input, button {
+      padding: 12px;
+      margin: 8px;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    input {
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #qr-code {
+      margin-top: 20px;
+    }
+    small a {
+      color: #fff;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    #response-message {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+    #response-message.success {
+      color: lightgreen;
+    }
+    #response-message.error {
+      color: red;
+    }
+    #error-alert {
+      background-color: rgba(255, 0, 0, 0.1);
+      border: 1px solid red;
+      padding: 10px;
+      margin-top: 10px;
+      color: red;
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 20px;
+      }
+      input, button {
+        width: 90%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -13,10 +85,10 @@
   <h2 id="form-title">Register</h2>
 
   <div>
-    <input type="text" id="username" placeholder="Username"><br>
-    <input type="password" id="password" placeholder="Password"><br>
-    <input type="text" id="fullname" placeholder="Full Name"><br>
-    <input type="text" id="studentNumber" placeholder="Student Number"><br>
+    <input type="text" id="username" placeholder="Username" required><br>
+    <input type="password" id="password" placeholder="Password" required><br>
+    <input type="text" id="fullname" placeholder="Full Name" required><br>
+    <input type="text" id="studentNumber" placeholder="Student Number" required><br>
     <button onclick="submitForm()">Submit</button>
     <br>
     <small><a href="#" onclick="toggleForm()">Switch to Login</a></small>
@@ -24,11 +96,13 @@
 
   <div id="response-message"></div>
   <div id="qr-code"></div>
+  <div id="error-alert">Failed to submit data. Please try again later.</div>
 
   <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbzEo4EFfmetqWJK3jTun7LqOBuxE5QK3V1tGwpF1dSsLgcXC-6ygLcgq9mndCronVRAxg/exec";
     let isLogin = false;
 
+    // Toggle between Register and Login forms
     function toggleForm() {
       isLogin = !isLogin;
       document.getElementById("form-title").innerText = isLogin ? "Login" : "Register";
@@ -36,8 +110,10 @@
       document.getElementById("studentNumber").style.display = isLogin ? "none" : "inline-block";
       document.getElementById("response-message").innerText = "";
       document.getElementById("qr-code").innerHTML = "";
+      document.getElementById("error-alert").style.display = "none"; // Hide error alert
     }
 
+    // Handle form submission
     async function submitForm() {
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
@@ -52,42 +128,66 @@
         studentNumber
       };
 
-      const res = await fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" }
-      });
+      // Clear previous error messages and responses
+      document.getElementById("error-alert").style.display = "none";
+      document.getElementById("response-message").innerText = "";
+      document.getElementById("qr-code").innerHTML = "";
 
-      const data = await res.json();
-      const messageDiv = document.getElementById("response-message");
-      const qrDiv = document.getElementById("qr-code");
-      messageDiv.innerText = data.message;
-      messageDiv.style.color = data.status === "success" ? "lightgreen" : "red";
-
-      if (data.status === "success") {
-        const qrData = isLogin
-          ? `Logged In\nName: ${data.fullname}\nID: ${data.studentNumber}`
-          : `Registered\nName: ${fullname}\nID: ${studentNumber}`;
-        QRCode.toCanvas(qrData, { width: 200 }, (err, canvas) => {
-          qrDiv.innerHTML = "";
-          qrDiv.appendChild(canvas);
+      try {
+        const res = await fetch(scriptURL, {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" }
         });
 
-        if (!isLogin) {
-          // Switch to login after registration
-          setTimeout(() => {
-            toggleForm();
-            document.getElementById("response-message").innerText = "Now login with your new account.";
-          }, 2000);
-        } else {
-          // Redirect to dashboard after login
-          setTimeout(() => {
-            window.location.href = "dashboard.html";
-          }, 2000);
+        if (!res.ok) {
+          throw new Error("Network response was not ok.");
         }
-      } else {
-        qrDiv.innerHTML = "";
+
+        const data = await res.json();
+        const messageDiv = document.getElementById("response-message");
+        const qrDiv = document.getElementById("qr-code");
+
+        messageDiv.innerText = data.message;
+        messageDiv.className = data.status === "success" ? "success" : "error";
+
+        if (data.status === "success") {
+          const qrData = isLogin
+            ? `Logged In\nName: ${data.fullname}\nID: ${data.studentNumber}`
+            : `Registered\nName: ${fullname}\nID: ${studentNumber}`;
+
+          // Generate the QR code
+          QRCode.toCanvas(qrData, { width: 200 }, (err, canvas) => {
+            qrDiv.innerHTML = "";
+            qrDiv.appendChild(canvas);
+          });
+
+          if (!isLogin) {
+            // Switch to login after registration
+            setTimeout(() => {
+              toggleForm();
+              document.getElementById("response-message").innerText = "Now login with your new account.";
+            }, 2000);
+          } else {
+            // Redirect to dashboard after login
+            setTimeout(() => {
+              window.location.href = "dashboard.html";
+            }, 2000);
+          }
+        } else {
+          showErrorAlert("Failed to register or login. Please try again.");
+        }
+      } catch (error) {
+        showErrorAlert("Failed to submit data. Please try again later.");
+        console.error("Error during fetch:", error);
       }
+    }
+
+    // Show error alert
+    function showErrorAlert(message) {
+      const alertDiv = document.getElementById("error-alert");
+      alertDiv.innerText = message;
+      alertDiv.style.display = "block"; // Show the error alert
     }
   </script>
 
