@@ -1,121 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login & Register</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register Form</title>
   <style>
-    body { font-family: Arial; max-width: 400px; margin: 40px auto; }
-    h2 { text-align: center; }
-    .form-container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
-    .tab { display: inline-block; margin: 0 10px; cursor: pointer; font-weight: bold; }
-    .tab.active { color: blue; }
-    form { display: none; margin-top: 20px; }
-    form.active { display: block; }
-    label { display: block; margin-top: 10px; }
-    input[type=text], input[type=password] {
-      width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box;
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    form {
+      max-width: 400px;
+      margin: auto;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      box-sizing: border-box;
     }
     button {
-      margin-top: 20px; padding: 10px; width: 100%; background: blue; color: white; border: none; cursor: pointer;
+      background-color: blue;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
-    .message { margin-top: 15px; text-align: center; }
+    button:disabled {
+      background-color: gray;
+      cursor: not-allowed;
+    }
+    .message {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+    }
+    .success {
+      color: green;
+    }
   </style>
 </head>
 <body>
 
-<h2>Login & Register</h2>
-
-<div>
-  <span id="tab-login" class="tab active">Login</span>
-  <span id="tab-register" class="tab">Register</span>
-</div>
-
-<div class="form-container">
-  <form id="login-form" class="active">
-    <label>Username <input type="text" id="login-username" required /></label>
-    <label>Password <input type="password" id="login-password" required /></label>
-    <button type="submit">Login</button>
-  </form>
-
-  <form id="register-form">
-    <label>Username <input type="text" id="reg-username" required /></label>
-    <label>Password <input type="password" id="reg-password" required /></label>
-    <label>Full Name <input type="text" id="reg-fullname" required /></label>
-    <label>Student Number <input type="text" id="reg-studentnumber" required /></label>
-    <label>Course <input type="text" id="reg-course" required /></label>
+  <h2>Register</h2>
+  <form id="registerForm">
+    <input type="text" id="username" placeholder="Username" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <input type="text" id="fullname" placeholder="Full Name" required />
+    <input type="text" id="studentNumber" placeholder="Student Number" required />
+    <input type="text" id="course" placeholder="Course" required />
     <button type="submit">Register</button>
   </form>
 
   <div class="message" id="message"></div>
-</div>
 
-<script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbzEo4EFfmetqWJK3jTun7LqOBuxE5QK3V1tGwpF1dSsLgcXC-6ygLcgq9mndCronVRAxg/exec";
+  <script>
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbzEo4EFfmetqWJK3jTun7LqOBuxE5QK3V1tGwpF1dSsLgcXC-6ygLcgq9mndCronVRAxg/exec'; // Replace with your Google Apps Script Web App URL
 
-  const tabLogin = document.getElementById('tab-login');
-  const tabRegister = document.getElementById('tab-register');
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-  const messageBox = document.getElementById('message');
+    const form = document.getElementById('registerForm');
+    const messageDiv = document.getElementById('message');
 
-  tabLogin.onclick = () => {
-    tabLogin.classList.add('active');
-    tabRegister.classList.remove('active');
-    loginForm.classList.add('active');
-    registerForm.classList.remove('active');
-    messageBox.textContent = "";
-  };
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
 
-  tabRegister.onclick = () => {
-    tabRegister.classList.add('active');
-    tabLogin.classList.remove('active');
-    registerForm.classList.add('active');
-    loginForm.classList.remove('active');
-    messageBox.textContent = "";
-  };
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const fullname = document.getElementById('fullname').value.trim();
+      const studentNumber = document.getElementById('studentNumber').value.trim();
+      const course = document.getElementById('course').value.trim();
 
-  loginForm.onsubmit = (e) => {
-    e.preventDefault();
-    const data = {
-      action: "login",
-      username: document.getElementById('login-username').value.trim(),
-      password: document.getElementById('login-password').value.trim(),
-    };
-    submitForm(data);
-  };
+      messageDiv.textContent = '';
+      messageDiv.className = 'message';
 
-  registerForm.onsubmit = (e) => {
-    e.preventDefault();
-    const data = {
-      action: "register",
-      username: document.getElementById('reg-username').value.trim(),
-      password: document.getElementById('reg-password').value.trim(),
-      fullname: document.getElementById('reg-fullname').value.trim(),
-      studentnumber: document.getElementById('reg-studentnumber').value.trim(),
-      course: document.getElementById('reg-course').value.trim(),
-    };
-    submitForm(data);
-  };
+      if (!username || !password || !fullname || !studentNumber || !course) {
+        messageDiv.textContent = 'Please fill all fields.';
+        messageDiv.classList.add('error');
+        return;
+      }
 
-  function submitForm(data) {
-    messageBox.style.color = "black";
-    messageBox.textContent = "Processing...";
+      const data = {
+        action: 'register',
+        username,
+        password,
+        fullname,
+        studentNumber,
+        course
+      };
 
-    fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" },
-    })
-      .then(res => res.json())
-      .then(resp => {
-        messageBox.textContent = resp.message;
-        messageBox.style.color = resp.status === "success" ? "green" : "red";
+      fetch(webAppUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
       })
-      .catch(() => {
-        messageBox.textContent = "Error connecting to server";
-        messageBox.style.color = "red";
+      .then(response => response.json())
+      .then(result => {
+        if (result.status === 'success') {
+          messageDiv.textContent = result.message;
+          messageDiv.classList.add('success');
+          form.reset();
+        } else {
+          messageDiv.textContent = result.message || 'Registration failed';
+          messageDiv.classList.add('error');
+        }
+      })
+      .catch(error => {
+        messageDiv.textContent = 'Error connecting to server';
+        messageDiv.classList.add('error');
+        console.error('Fetch error:', error);
       });
-  }
-</script>
+    });
+  </script>
 
 </body>
 </html>
