@@ -45,14 +45,18 @@
 <body>
 
   <h2>Register</h2>
-  <form id="registerForm">
-    <input type="text" id="username" placeholder="Username" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <input type="text" id="fullname" placeholder="Full Name" required />
-    <input type="text" id="studentNumber" placeholder="Student Number" required />
-    <input type="text" id="course" placeholder="Course" required />
-    <button type="submit">Register</button>
-  </form>
+<form id="registerForm" action="YOUR_WEB_APP_URL_HERE" method="post" target="hidden_iframe">
+  <input type="text" name="username" placeholder="Username" required><br>
+  <input type="password" name="password" placeholder="Password" required><br>
+  <input type="text" name="fullname" placeholder="Full Name" required><br>
+  <input type="text" name="studentNumber" placeholder="Student Number" required><br>
+  <input type="text" name="course" placeholder="Course" required><br>
+  <input type="hidden" name="action" value="register">
+  <button type="submit">Register</button>
+</form>
+
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+
 
   <div class="message" id="message"></div>
 
