@@ -97,7 +97,7 @@
       username: document.getElementById('login-username').value.trim(),
       password: document.getElementById('login-password').value.trim(),
     };
-    fetch("./", {
+    fetch("https://script.google.com/macros/s/AKfycbzEo4EFfmetqWJK3jTun7LqOBuxE5QK3V1tGwpF1dSsLgcXC-6ygLcgq9mndCronVRAxg/exec", {
       method: "POST",
       body: JSON.stringify(data),
       headers: { 'Content-Type': 'application/json' }
@@ -130,7 +130,7 @@
       studentnumber: document.getElementById('reg-studentnumber').value.trim(),
       course: document.getElementById('reg-course').value.trim()
     };
-    fetch("./", {
+    fetch("https://script.google.com/macros/s/AKfycbzEo4EFfmetqWJK3jTun7LqOBuxE5QK3V1tGwpF1dSsLgcXC-6ygLcgq9mndCronVRAxg/exec", {
       method: "POST",
       body: JSON.stringify(data),
       headers: { 'Content-Type': 'application/json' }
