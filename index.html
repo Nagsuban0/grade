@@ -65,8 +65,7 @@
 </div>
 
 <script>
-  const webAppUrl = "https://script.google.com/macros/s/AKfycbzEo4EFfmetqWJK3jTun7LqOBuxE5QK3V1tGwpF1dSsLgcXC-6ygLcgq9mndCronVRAxg/exec"; // Replace with your Apps Script Web App URL
-
+  // Fetch calls the same origin (Apps Script Web App)
   const loginTab = document.getElementById('tab-login');
   const registerTab = document.getElementById('tab-register');
   const loginForm = document.getElementById('login-form');
@@ -91,13 +90,14 @@
 
   loginForm.addEventListener('submit', e => {
     e.preventDefault();
+    messageBox.style.color = "black";
     messageBox.textContent = "Logging in...";
     const data = {
       action: "login",
       username: document.getElementById('login-username').value.trim(),
       password: document.getElementById('login-password').value.trim(),
     };
-    fetch(webAppUrl, {
+    fetch("./", {
       method: "POST",
       body: JSON.stringify(data),
       headers: { 'Content-Type': 'application/json' }
@@ -106,13 +106,13 @@
     .then(resp => {
       messageBox.textContent = resp.message;
       if (resp.status === "success") {
-        // Do something on successful login
         messageBox.style.color = "green";
+        // Add your post-login action here, e.g., redirect
       } else {
         messageBox.style.color = "red";
       }
     })
-    .catch(err => {
+    .catch(() => {
       messageBox.textContent = "Error connecting to server";
       messageBox.style.color = "red";
     });
@@ -120,6 +120,7 @@
 
   registerForm.addEventListener('submit', e => {
     e.preventDefault();
+    messageBox.style.color = "black";
     messageBox.textContent = "Registering...";
     const data = {
       action: "register",
@@ -129,7 +130,7 @@
       studentnumber: document.getElementById('reg-studentnumber').value.trim(),
       course: document.getElementById('reg-course').value.trim()
     };
-    fetch(webAppUrl, {
+    fetch("./", {
       method: "POST",
       body: JSON.stringify(data),
       headers: { 'Content-Type': 'application/json' }
@@ -144,7 +145,7 @@
         messageBox.style.color = "red";
       }
     })
-    .catch(err => {
+    .catch(() => {
       messageBox.textContent = "Error connecting to server";
       messageBox.style.color = "red";
     });
