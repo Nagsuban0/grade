@@ -1,26 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Login & Register</title>
-<style>
-  body { font-family: Arial, sans-serif; max-width: 400px; margin: 40px auto; }
-  h2 { text-align: center; }
-  .form-container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
-  .tab { display: inline-block; margin: 0 10px; cursor: pointer; font-weight: bold; }
-  .tab.active { color: blue; }
-  form { display: none; margin-top: 20px; }
-  form.active { display: block; }
-  label { display: block; margin-top: 10px; }
-  input[type=text], input[type=password] {
-    width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box;
-  }
-  button {
-    margin-top: 20px; padding: 10px; width: 100%; background: blue; color: white; border: none; cursor: pointer;
-  }
-  .message { margin-top: 15px; text-align: center; }
-</style>
+  <title>Login & Register</title>
+  <style>
+    body { font-family: Arial; max-width: 400px; margin: 40px auto; }
+    h2 { text-align: center; }
+    .form-container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+    .tab { display: inline-block; margin: 0 10px; cursor: pointer; font-weight: bold; }
+    .tab.active { color: blue; }
+    form { display: none; margin-top: 20px; }
+    form.active { display: block; }
+    label { display: block; margin-top: 10px; }
+    input[type=text], input[type=password] {
+      width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box;
+    }
+    button {
+      margin-top: 20px; padding: 10px; width: 100%; background: blue; color: white; border: none; cursor: pointer;
+    }
+    .message { margin-top: 15px; text-align: center; }
+  </style>
 </head>
 <body>
 
@@ -33,31 +31,17 @@
 
 <div class="form-container">
   <form id="login-form" class="active">
-    <label>Username
-      <input type="text" id="login-username" required />
-    </label>
-    <label>Password
-      <input type="password" id="login-password" required />
-    </label>
+    <label>Username <input type="text" id="login-username" required /></label>
+    <label>Password <input type="password" id="login-password" required /></label>
     <button type="submit">Login</button>
   </form>
 
   <form id="register-form">
-    <label>Username
-      <input type="text" id="reg-username" required />
-    </label>
-    <label>Password
-      <input type="password" id="reg-password" required />
-    </label>
-    <label>Full Name
-      <input type="text" id="reg-fullname" required />
-    </label>
-    <label>Student Number
-      <input type="text" id="reg-studentnumber" required />
-    </label>
-    <label>Course
-      <input type="text" id="reg-course" required />
-    </label>
+    <label>Username <input type="text" id="reg-username" required /></label>
+    <label>Password <input type="password" id="reg-password" required /></label>
+    <label>Full Name <input type="text" id="reg-fullname" required /></label>
+    <label>Student Number <input type="text" id="reg-studentnumber" required /></label>
+    <label>Course <input type="text" id="reg-course" required /></label>
     <button type="submit">Register</button>
   </form>
 
@@ -65,72 +49,56 @@
 </div>
 
 <script>
-  // Fetch calls the same origin (Apps Script Web App)
-  const loginTab = document.getElementById('tab-login');
-  const registerTab = document.getElementById('tab-register');
+  const tabLogin = document.getElementById('tab-login');
+  const tabRegister = document.getElementById('tab-register');
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
   const messageBox = document.getElementById('message');
 
-  loginTab.onclick = () => {
-    loginTab.classList.add('active');
-    registerTab.classList.remove('active');
+  tabLogin.onclick = () => {
+    tabLogin.classList.add('active');
+    tabRegister.classList.remove('active');
     loginForm.classList.add('active');
     registerForm.classList.remove('active');
     messageBox.textContent = "";
   };
 
-  registerTab.onclick = () => {
-    registerTab.classList.add('active');
-    loginTab.classList.remove('active');
+  tabRegister.onclick = () => {
+    tabRegister.classList.add('active');
+    tabLogin.classList.remove('active');
     registerForm.classList.add('active');
     loginForm.classList.remove('active');
     messageBox.textContent = "";
   };
 
-  loginForm.addEventListener('submit', e => {
+  loginForm.onsubmit = (e) => {
     e.preventDefault();
-    messageBox.style.color = "black";
-    messageBox.textContent = "Logging in...";
     const data = {
       action: "login",
       username: document.getElementById('login-username').value.trim(),
       password: document.getElementById('login-password').value.trim(),
     };
-    fetch("https://script.google.com/macros/s/AKfycbzEo4EFfmetqWJK3jTun7LqOBuxE5QK3V1tGwpF1dSsLgcXC-6ygLcgq9mndCronVRAxg/exec", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' }
-    })
-    .then(res => res.json())
-    .then(resp => {
-      messageBox.textContent = resp.message;
-      if (resp.status === "success") {
-        messageBox.style.color = "green";
-        // Add your post-login action here, e.g., redirect
-      } else {
-        messageBox.style.color = "red";
-      }
-    })
-    .catch(() => {
-      messageBox.textContent = "Error connecting to server";
-      messageBox.style.color = "red";
-    });
-  });
+    submitForm(data);
+  };
 
-  registerForm.addEventListener('submit', e => {
+  registerForm.onsubmit = (e) => {
     e.preventDefault();
-    messageBox.style.color = "black";
-    messageBox.textContent = "Registering...";
     const data = {
       action: "register",
       username: document.getElementById('reg-username').value.trim(),
       password: document.getElementById('reg-password').value.trim(),
       fullname: document.getElementById('reg-fullname').value.trim(),
       studentnumber: document.getElementById('reg-studentnumber').value.trim(),
-      course: document.getElementById('reg-course').value.trim()
+      course: document.getElementById('reg-course').value.trim(),
     };
-    fetch("https://script.google.com/macros/s/AKfycbzEo4EFfmetqWJK3jTun7LqOBuxE5QK3V1tGwpF1dSsLgcXC-6ygLcgq9mndCronVRAxg/exec", {
+    submitForm(data);
+  };
+
+  function submitForm(data) {
+    messageBox.style.color = "black";
+    messageBox.textContent = "Processing...";
+
+    fetch("", {
       method: "POST",
       body: JSON.stringify(data),
       headers: { 'Content-Type': 'application/json' }
@@ -138,18 +106,13 @@
     .then(res => res.json())
     .then(resp => {
       messageBox.textContent = resp.message;
-      if (resp.status === "success") {
-        messageBox.style.color = "green";
-        registerForm.reset();
-      } else {
-        messageBox.style.color = "red";
-      }
+      messageBox.style.color = resp.status === "success" ? "green" : "red";
     })
     .catch(() => {
       messageBox.textContent = "Error connecting to server";
       messageBox.style.color = "red";
     });
-  });
+  }
 </script>
 
 </body>
