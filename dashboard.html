@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    h2 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+    canvas {
+      width: 100px;
+      height: 100px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Student Grades Dashboard</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Full Name</th>
+        <th>Username</th>
+        <th>Student No.</th>
+        <th>Course</th>
+        <th>Subject</th>
+        <th>Grade</th>
+        <th>QR Code</th>
+      </tr>
+    </thead>
+    <tbody id="student-table-body"></tbody>
+  </table>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzEo4EFfmetqWJK3jTun7LqOBuxE5QK3V1tGwpF1dSsLgcXC-6ygLcgq9mndCronVRAxg/exec";
+
+    fetch(scriptURL)
+      .then(response => response.json())
+      .then(data => {
+        const tbody = document.getElementById("student-table-body");
+
+        data.forEach((student, index) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+            <td>${student.fullname}</td>
+            <td>${student.username}</td>
+            <td>${student.studentNumber}</td>
+            <td>${student.course}</td>
+            <td>${student.subject}</td>
+            <td>${student.grade}</td>
+            <td><canvas id="qr-${index}"></canvas></td>
+          `;
+
+          tbody.appendChild(row);
+
+          const qrText = `
+            Name: ${student.fullname}
+            ID: ${student.studentNumber}
+            Course: ${student.course}
+            Subject: ${student.subject}
+            Grade: ${student.grade}
+          `;
+          const canvas = document.getElementById(`qr-${index}`);
+          QRCode.toCanvas(canvas, qrText.trim());
+        });
+      })
+      .catch(error => {
+        alert("Failed to load student data.");
+        console.error(error);
+      });
+  </script>
+
+</body>
+</html>
